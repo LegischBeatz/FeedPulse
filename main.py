@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from typing import Optional
 
-from rss_parser import parse_rss
+from rss_parser import parse_rss, DEFAULT_LIMIT
 from llm_client import LLMClient, LLMConfig
 from cache import SimpleCache
 from db import store_article, list_articles
@@ -55,7 +55,7 @@ async def summarize_rss(
 
     articles = feed_cache.get(rss_url)
     if articles is None:
-        articles = await asyncio.to_thread(parse_rss, rss_url)
+        articles = await asyncio.to_thread(parse_rss, rss_url, DEFAULT_LIMIT)
         feed_cache.set(rss_url, articles)
 
     config = LLMConfig.load()
