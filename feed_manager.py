@@ -5,7 +5,13 @@ from pathlib import Path
 from typing import List, Tuple
 
 from rss_parser import parse_rss, DEFAULT_LIMIT
-from db import store_article
+from db import (
+    store_processed_article,
+    store_rewritten_article,
+    compute_hash,
+    get_rewritten_article,
+)
+from llm_client import LLMClient, LLMConfig
 
 
 CONFIG_PATH = Path(__file__).resolve().parent / "config.ini"
@@ -30,6 +36,22 @@ def load_feed_config(path: Path = CONFIG_PATH) -> Tuple[List[str], int]:
     return feeds, interval
 
 
+async def rewrite_and_store(article: dict, llm: LLMClient, source: str) -> None:
+    try:
+        if not store_processed_article(article["title"], article["link"], article.get("date", "")):
+            logging.debug("Duplicate article skipped from %s: %s", source, article["title"])
+            return
+
+        prompt = (
+            f"Rewrite the following article in your own words:\n\nTitle: {article['title']}\n\n{article['summary']}"
+        )
+        rewritten = await asyncio.to_thread(llm.generate, prompt)
+        store_rewritten_article(article["title"], article["link"], rewritten, article.get("date", ""))
+        logging.info("Stored rewritten article from %s: %s", source, article["title"])
+    except Exception as exc:
+        logging.error("Failed to rewrite %s from %s: %s", article.get("title"), source, exc)
+
+
 async def fetch_and_store(url: str) -> None:
     try:
         articles = await asyncio.to_thread(parse_rss, url, DEFAULT_LIMIT)
@@ -37,12 +59,12 @@ async def fetch_and_store(url: str) -> None:
             logging.warning("%s returned %d articles", url, len(articles))
         else:
             logging.info("Fetched %d articles from %s", len(articles), url)
-        for art in articles:
-            stored = store_article(art["title"], art["link"], art["summary"], art["date"])
-            if stored:
-                logging.info("Stored article from %s: %s", url, art["title"])
-            else:
-                logging.debug("Duplicate article skipped from %s: %s", url, art["title"])
+
+        config = LLMConfig.load()
+        with LLMClient(config) as llm:
+            tasks = [rewrite_and_store(art, llm, url) for art in articles]
+            if tasks:
+                await asyncio.gather(*tasks)
     except Exception as exc:
         logging.error("Failed to process %s: %s", url, exc)
 

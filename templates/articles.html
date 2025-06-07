@@ -5,13 +5,13 @@
     <title>FeedPulse Articles</title>
 </head>
 <body>
-    <h1>Summarized Articles</h1>
+    <h1>Rewritten Articles</h1>
     <ul>
     {% for article in articles %}
         <li>
             <a href="{{ article.link }}">{{ article.title }}</a><br/>
             <small>{{ article.date }}</small>
-            <p>{{ article.summary }}</p>
+            <p>{{ article.content }}</p>
         </li>
     {% else %}
         <li>No articles found.</li>
