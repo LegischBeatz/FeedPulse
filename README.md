@@ -8,6 +8,8 @@ FeedPulse is a modern RSS feed aggregation and summarization tool designed speci
 * **Team Collaboration**: Share curated feeds and summaries easily within your team, ensuring everyone is up-to-date.
 * **Browser-Friendly Interface**: Enjoy a clean, intuitive user interface optimized for easy readability and quick browsing.
 * **Customizable Feeds**: Tailor your news feed experience by selecting and organizing specific RSS sources relevant to your team's interests.
+* **Built-in Caching**: Recently fetched feeds are cached for faster responses.
+* **Async Summaries**: Articles are summarized concurrently for improved performance.
 
 ## Use Cases
 
@@ -22,7 +24,9 @@ To get started with FeedPulse, simply clone this repository and follow the provi
 ```bash
 git clone https://github.com/yourusername/FeedPulse.git
 cd FeedPulse
-# Follow setup instructions
+# Install dependencies and start the API
+pip install -r requirements.txt
+uvicorn main:app --reload
 ```
 
 ## Contributing
