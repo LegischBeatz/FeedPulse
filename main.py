@@ -10,7 +10,13 @@ from typing import Optional
 from rss_parser import parse_rss, DEFAULT_LIMIT
 from llm_client import LLMClient, LLMConfig
 from cache import SimpleCache
-from db import store_article, list_articles
+from db import (
+    store_processed_article,
+    store_rewritten_article,
+    get_rewritten_article,
+    list_rewritten_articles,
+    compute_hash,
+)
 from fastapi.responses import RedirectResponse
 import uvicorn
 
@@ -31,19 +37,24 @@ def validate_url(url: str) -> str:
     return url
 
 
-async def summarize_article(article: dict, llm: LLMClient) -> dict:
+async def rewrite_article(article: dict, llm: LLMClient) -> dict:
+    h = compute_hash(article["title"], article.get("date", ""))
+    if not store_processed_article(article["title"], article["link"], article.get("date", "")):
+        existing = get_rewritten_article(h)
+        if existing:
+            return existing
+
     prompt = (
-        f"Title: {article['title']}\n\n{article['summary']}\n\n"
-        "Provide a brief summary in 2-3 sentences."
+        f"Rewrite the following article in your own words:\n\nTitle: {article['title']}\n\n{article['summary']}"
     )
-    summary = await asyncio.to_thread(llm.generate, prompt)
+    rewritten = await asyncio.to_thread(llm.generate, prompt)
     result = {
         "title": article["title"],
         "link": article["link"],
-        "summary": summary,
+        "content": rewritten,
         "date": article.get("date", ""),
     }
-    store_article(result["title"], result["link"], result["summary"], result["date"])
+    store_rewritten_article(result["title"], result["link"], result["content"], result["date"])
     return result
 
 
@@ -62,12 +73,12 @@ async def summarize_rss(
     if model:
         config.model_name = model
 
-    summaries = []
+    results = []
     with LLMClient(config) as llm:
-        tasks = [summarize_article(article, llm) for article in articles]
-        summaries = await asyncio.gather(*tasks)
+        tasks = [rewrite_article(article, llm) for article in articles]
+        results = await asyncio.gather(*tasks)
 
-    return {"summaries": summaries}
+    return {"articles": results}
 
 
 @app.get("/", include_in_schema=False)
@@ -77,7 +88,7 @@ async def index():
 
 @app.get("/articles", response_class=HTMLResponse)
 async def show_articles(request: Request):
-    articles = list_articles()
+    articles = list_rewritten_articles()
     return templates.TemplateResponse(
         "articles.html", {"request": request, "articles": articles}
     )

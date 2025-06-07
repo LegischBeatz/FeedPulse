@@ -1,15 +1,15 @@
 # FeedPulse
 
-FeedPulse is a modern RSS feed aggregation and summarization tool designed specifically for teams. It transforms RSS feeds into concise, blog-style summaries directly accessible via your browser, helping teams stay informed, organized, and aligned on the latest news and updates relevant to their workflow.
+FeedPulse is a modern RSS feed aggregation and rewriting tool designed specifically for teams. It transforms RSS feeds into concise, blog-style articles rewritten by an LLM and directly accessible via your browser, helping teams stay informed, organized, and aligned on the latest news and updates relevant to their workflow.
 
 ## Features
 
-* **Automated Summaries**: FeedPulse automatically extracts key insights and summarizes RSS content into clear, concise blog-style articles.
+* **Automated Rewrites**: FeedPulse automatically rewrites RSS content into clear, concise blog-style articles.
 * **Team Collaboration**: Share curated feeds and summaries easily within your team, ensuring everyone is up-to-date.
 * **Browser-Friendly Interface**: Enjoy a clean, intuitive user interface optimized for easy readability and quick browsing.
 * **Customizable Feeds**: Tailor your news feed experience by selecting and organizing specific RSS sources relevant to your team's interests.
 * **Built-in Caching**: Recently fetched feeds are cached for faster responses.
-* **Async Summaries**: Articles are summarized concurrently for improved performance.
+* **Async Rewrites**: Articles are rewritten concurrently for improved performance.
 
 ## Use Cases
 
@@ -49,7 +49,7 @@ The server will listen on `http://localhost:8000` by default.
 
 ## Usage Guide
 
-### Summarize a Feed
+### Rewrite a Feed
 
 Send a GET request to `/summarize` with the RSS feed URL:
 
@@ -63,13 +63,13 @@ Optionally, specify a different model using the `model` query parameter:
 curl "http://localhost:8000/summarize?rss_url=https://example.com/feed.xml&model=my-model"
 ```
 
-The response contains a JSON array of article titles, links, dates and generated
-summaries. Each request also stores the results in a local SQLite database.
+The response contains a JSON array of article titles, links, dates and rewritten
+content. Each request also stores the results in a local SQLite database.
 
 ### View Stored Articles
 
 Open `http://localhost:8000/articles` in your browser to see previously
-summarized articles rendered as a simple web page.
+rewritten articles rendered as a simple web page.
 
 ## Feed Manager
 
