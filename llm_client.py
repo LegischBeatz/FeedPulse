@@ -19,6 +19,9 @@ class LLMConfig:
     model_name: str
     timeout: int = 60
     max_retries: int = 3
+    rewrite_prompt: str = (
+        "Rewrite the following article in your own words:\n\nTitle: {title}\n\n{summary}"
+    )
 
     @classmethod
     def load(cls, path: Optional[Path] = None, section: str = "LLM") -> "LLMConfig":
@@ -31,9 +34,20 @@ class LLMConfig:
         model_name = parser.get(section, "model_name", fallback=None)
         timeout = parser.getint(section, "timeout", fallback=60)
         max_retries = parser.getint(section, "max_retries", fallback=3)
+        rewrite_prompt = parser.get(
+            section,
+            "rewrite_prompt",
+            fallback="Rewrite the following article in your own words:\n\nTitle: {title}\n\n{summary}",
+        )
         if not api_url or not model_name:
             raise ValueError(f"Both 'api_url' and 'model_name' must be set in [{section}] of {cfg_path}")
-        return cls(api_url=api_url, model_name=model_name, timeout=timeout, max_retries=max_retries)
+        return cls(
+            api_url=api_url,
+            model_name=model_name,
+            timeout=timeout,
+            max_retries=max_retries,
+            rewrite_prompt=rewrite_prompt,
+        )
 
 class LLMClient:
     def __init__(self, config: LLMConfig, session: Optional[requests.Session] = None):
