@@ -8,6 +8,7 @@ from typing import Optional
 from rss_parser import parse_rss
 from llm_client import LLMClient, LLMConfig
 from cache import SimpleCache
+import uvicorn
 
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)
@@ -58,3 +59,7 @@ async def summarize_rss(
         summaries = await asyncio.gather(*tasks)
 
     return {"summaries": summaries}
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)

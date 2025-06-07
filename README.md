@@ -26,7 +26,7 @@ git clone https://github.com/yourusername/FeedPulse.git
 cd FeedPulse
 # Install dependencies and start the API
 pip install -r requirements.txt
-uvicorn main:app --reload
+python main.py  # or use `uvicorn main:app --reload`
 ```
 
 ## Contributing
