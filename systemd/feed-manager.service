@@ -1,0 +1,10 @@
+[Unit]
+Description=FeedPulse Daily Fetcher
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/feedpulse
+ExecStart=/usr/bin/python3 /opt/feedpulse/feed_manager.py
+
+[Install]
+WantedBy=multi-user.target

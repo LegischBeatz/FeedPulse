@@ -95,6 +95,33 @@ The script runs continuously, polling the configured feeds and persisting new
 articles to `articles.db`. Each cycle retrieves the ten most recent articles from
 every feed and skips entries that already exist in the database.
 
+### Daily Fetch with systemd
+
+If you prefer to fetch feeds once per day rather than running the manager
+continuously, use the systemd units in the `systemd` folder. Copy the files to
+`/etc/systemd/system/` and adjust the paths inside them to match the location of
+your FeedPulse checkout. Then enable the timer:
+
+```bash
+sudo systemctl enable feed-manager.timer
+sudo systemctl start feed-manager.timer
+```
+
+The timer runs `feed_manager.py` every morning at 06:00 and stores any new
+articles in `articles.db`.
+
+### Running the API as a Service
+
+To keep the FastAPI server available in the background, install the provided
+`feedpulse.service` unit in the same way:
+
+```bash
+sudo systemctl enable feedpulse.service
+sudo systemctl start feedpulse.service
+```
+
+The service launches `main.py` and will automatically restart on failure.
+
 ## Contributing
 
 We welcome contributions from the community! Feel free to submit issues, suggestions, or pull requests.
