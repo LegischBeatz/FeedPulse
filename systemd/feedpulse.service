@@ -1,0 +1,12 @@
+[Unit]
+Description=FeedPulse API Service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/feedpulse
+ExecStart=/usr/bin/python3 /opt/feedpulse/main.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
