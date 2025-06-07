@@ -2,16 +2,22 @@ import asyncio
 import logging
 from urllib.parse import urlparse
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from typing import Optional
 
 from rss_parser import parse_rss
 from llm_client import LLMClient, LLMConfig
 from cache import SimpleCache
+from db import store_article, list_articles
+from fastapi.responses import RedirectResponse
 import uvicorn
 
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)
+
+templates = Jinja2Templates(directory="templates")
 
 feed_cache = SimpleCache(ttl=600)
 
@@ -31,11 +37,14 @@ async def summarize_article(article: dict, llm: LLMClient) -> dict:
         "Provide a brief summary in 2-3 sentences."
     )
     summary = await asyncio.to_thread(llm.generate, prompt)
-    return {
+    result = {
         "title": article["title"],
         "link": article["link"],
         "summary": summary,
+        "date": article.get("date", ""),
     }
+    store_article(result["title"], result["link"], result["summary"], result["date"])
+    return result
 
 
 @app.get("/summarize")
@@ -59,6 +68,19 @@ async def summarize_rss(
         summaries = await asyncio.gather(*tasks)
 
     return {"summaries": summaries}
+
+
+@app.get("/", include_in_schema=False)
+async def index():
+    return RedirectResponse(url="/articles")
+
+
+@app.get("/articles", response_class=HTMLResponse)
+async def show_articles(request: Request):
+    articles = list_articles()
+    return templates.TemplateResponse(
+        "articles.html", {"request": request, "articles": articles}
+    )
 
 
 if __name__ == "__main__":
