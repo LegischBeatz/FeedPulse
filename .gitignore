@@ -16,3 +16,4 @@ venv/
 # macOS / Windows / Linux
 .DS_Store
 Thumbs.db
+config.ini
