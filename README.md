@@ -34,8 +34,9 @@ pip install -r requirements.txt
 ### Configuration
 
 The application relies on a running language model service. Edit `config.ini` to
-point `api_url` to your model's endpoint and specify the `model_name`. The
-defaults work with an Ollama-compatible API.
+point `api_url` to your model's endpoint and specify the `model_name`. You can
+also modify `rewrite_prompt` to change how articles are rewritten. The defaults
+work with an Ollama-compatible API.
 
 ### Running the API
 
@@ -57,10 +58,11 @@ Send a GET request to `/summarize` with the RSS feed URL:
 curl "http://localhost:8000/summarize?rss_url=https://example.com/feed.xml"
 ```
 
-Optionally, specify a different model using the `model` query parameter:
+Optionally, specify a different model using the `model` query parameter or
+override the rewrite prompt with `prompt`:
 
 ```bash
-curl "http://localhost:8000/summarize?rss_url=https://example.com/feed.xml&model=my-model"
+curl "http://localhost:8000/summarize?rss_url=https://example.com/feed.xml&model=my-model&prompt=Summarize%20this:%20{title}"
 ```
 
 The response contains a JSON array of article titles, links, dates and rewritten
@@ -80,7 +82,9 @@ the dependencies listed in `requirements.txt` before running it. The default
 
 1. Edit `config.ini` and list your feeds under the `[RSS]` section. You can
    provide one feed URL per line or separate them with commas. Adjust the
-   `interval` value to control how often the feeds are fetched.
+   `interval` value to control how often the feeds are fetched. You can also
+   tweak the `rewrite_prompt` under `[LLM]` to change how each entry is
+   rewritten.
 2. Start the manager:
 
 ```bash

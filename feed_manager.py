@@ -36,15 +36,15 @@ def load_feed_config(path: Path = CONFIG_PATH) -> Tuple[List[str], int]:
     return feeds, interval
 
 
-async def rewrite_and_store(article: dict, llm: LLMClient, source: str) -> None:
+async def rewrite_and_store(
+    article: dict, llm: LLMClient, source: str, prompt_template: str
+) -> None:
     try:
         if not store_processed_article(article["title"], article["link"], article.get("date", "")):
             logging.debug("Duplicate article skipped from %s: %s", source, article["title"])
             return
 
-        prompt = (
-            f"Rewrite the following article in your own words:\n\nTitle: {article['title']}\n\n{article['summary']}"
-        )
+        prompt = prompt_template.format(title=article["title"], summary=article["summary"])
         rewritten = await asyncio.to_thread(llm.generate, prompt)
         store_rewritten_article(article["title"], article["link"], rewritten, article.get("date", ""))
         logging.info("Stored rewritten article from %s: %s", source, article["title"])
@@ -62,7 +62,10 @@ async def fetch_and_store(url: str) -> None:
 
         config = LLMConfig.load()
         with LLMClient(config) as llm:
-            tasks = [rewrite_and_store(art, llm, url) for art in articles]
+            tasks = [
+                rewrite_and_store(art, llm, url, config.rewrite_prompt)
+                for art in articles
+            ]
             if tasks:
                 await asyncio.gather(*tasks)
     except Exception as exc:
