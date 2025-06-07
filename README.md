@@ -19,15 +19,57 @@ FeedPulse is a modern RSS feed aggregation and summarization tool designed speci
 
 ## Getting Started
 
-To get started with FeedPulse, simply clone this repository and follow the provided setup instructions.
+Follow the steps below to set up and run FeedPulse locally.
+
+### Installation
+
+Clone the repository and install the required packages:
 
 ```bash
 git clone https://github.com/yourusername/FeedPulse.git
 cd FeedPulse
-# Install dependencies and start the API
 pip install -r requirements.txt
-python main.py  # or use `uvicorn main:app --reload`
 ```
+
+### Configuration
+
+The application relies on a running language model service. Edit `config.ini` to
+point `api_url` to your model's endpoint and specify the `model_name`. The
+defaults work with an Ollama-compatible API.
+
+### Running the API
+
+Start the FastAPI server:
+
+```bash
+uvicorn main:app --reload
+```
+
+The server will listen on `http://localhost:8000` by default.
+
+## Usage Guide
+
+### Summarize a Feed
+
+Send a GET request to `/summarize` with the RSS feed URL:
+
+```bash
+curl "http://localhost:8000/summarize?rss_url=https://example.com/feed.xml"
+```
+
+Optionally, specify a different model using the `model` query parameter:
+
+```bash
+curl "http://localhost:8000/summarize?rss_url=https://example.com/feed.xml&model=my-model"
+```
+
+The response contains a JSON array of article titles, links, dates and generated
+summaries. Each request also stores the results in a local SQLite database.
+
+### View Stored Articles
+
+Open `http://localhost:8000/articles` in your browser to see previously
+summarized articles rendered as a simple web page.
 
 ## Contributing
 
