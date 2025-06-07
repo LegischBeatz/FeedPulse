@@ -71,6 +71,24 @@ summaries. Each request also stores the results in a local SQLite database.
 Open `http://localhost:8000/articles` in your browser to see previously
 summarized articles rendered as a simple web page.
 
+## Feed Manager
+
+FeedPulse includes a helper script, `feed_manager.py`, for automatically
+fetching and storing articles from multiple RSS feeds. Ensure you have installed
+the dependencies listed in `requirements.txt` before running it.
+
+1. Edit `config.ini` and list your feeds under the `[RSS]` section. You can
+   provide one feed URL per line or separate them with commas. Adjust the
+   `interval` value to control how often the feeds are fetched.
+2. Start the manager:
+
+```bash
+python feed_manager.py
+```
+
+The script runs continuously, polling the configured feeds and persisting new
+articles to `articles.db`.
+
 ## Contributing
 
 We welcome contributions from the community! Feel free to submit issues, suggestions, or pull requests.
