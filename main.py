@@ -27,8 +27,6 @@ templates = Jinja2Templates(directory="templates")
 
 feed_cache = SimpleCache(ttl=600)
 
-llm_config = LLMConfig.load()
-
 
 def validate_url(url: str) -> str:
     parsed = urlparse(url)
@@ -37,16 +35,14 @@ def validate_url(url: str) -> str:
     return url
 
 
-async def rewrite_article(article: dict, llm: LLMClient) -> dict:
+async def rewrite_article(article: dict, llm: LLMClient, prompt_template: str) -> dict:
     h = compute_hash(article["title"], article.get("date", ""))
     if not store_processed_article(article["title"], article["link"], article.get("date", "")):
         existing = get_rewritten_article(h)
         if existing:
             return existing
 
-    prompt = (
-        f"Rewrite the following article in your own words:\n\nTitle: {article['title']}\n\n{article['summary']}"
-    )
+    prompt = prompt_template.format(title=article["title"], summary=article["summary"])
     rewritten = await asyncio.to_thread(llm.generate, prompt)
     result = {
         "title": article["title"],
@@ -60,7 +56,9 @@ async def rewrite_article(article: dict, llm: LLMClient) -> dict:
 
 @app.get("/summarize")
 async def summarize_rss(
-    rss_url: str = Query(..., alias="rss_url"), model: Optional[str] = None
+    rss_url: str = Query(..., alias="rss_url"),
+    model: Optional[str] = None,
+    prompt: Optional[str] = None,
 ):
     validate_url(rss_url)
 
@@ -72,10 +70,15 @@ async def summarize_rss(
     config = LLMConfig.load()
     if model:
         config.model_name = model
+    if prompt:
+        config.rewrite_prompt = prompt
 
     results = []
     with LLMClient(config) as llm:
-        tasks = [rewrite_article(article, llm) for article in articles]
+        tasks = [
+            rewrite_article(article, llm, config.rewrite_prompt)
+            for article in articles
+        ]
         results = await asyncio.gather(*tasks)
 
     return {"articles": results}
