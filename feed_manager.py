@@ -47,7 +47,13 @@ async def rewrite_and_store(
 
         prompt = prompt_template.format(title=article["title"], summary=article["summary"])
         rewritten = await asyncio.to_thread(llm.generate, prompt)
-        store_rewritten_article(article["title"], article["link"], rewritten, article.get("date", ""))
+        store_rewritten_article(
+            article["title"],
+            article["link"],
+            rewritten,
+            article.get("date", ""),
+            None,
+        )
         logging.info("Stored rewritten article from %s: %s", source, article["title"])
     except Exception as exc:
         logging.error("Failed to rewrite %s from %s: %s", article.get("title"), source, exc)

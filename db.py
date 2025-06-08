@@ -30,10 +30,17 @@ def get_conn():
                 link TEXT,
                 content TEXT,
                 date TEXT,
+                category TEXT,
                 hash TEXT UNIQUE
             )
             """
         )
+        # Add category column if the database was created without it
+        cur = _conn.execute("PRAGMA table_info(rewritten_articles)")
+        cols = [r[1] for r in cur.fetchall()]
+        if "category" not in cols:
+            _conn.execute("ALTER TABLE rewritten_articles ADD COLUMN category TEXT")
+            _conn.commit()
         _conn.execute(
             """
             CREATE TABLE IF NOT EXISTS feed_status (
@@ -64,13 +71,15 @@ def store_processed_article(title: str, link: str, date: str) -> bool:
         return False
 
 
-def store_rewritten_article(title: str, link: str, content: str, date: str) -> bool:
+def store_rewritten_article(
+    title: str, link: str, content: str, date: str, category: Optional[str] = None
+) -> bool:
     conn = get_conn()
     h = compute_hash(title, date)
     try:
         conn.execute(
-            "INSERT INTO rewritten_articles (title, link, content, date, hash) VALUES (?, ?, ?, ?, ?)",
-            (title, link, content, date, h),
+            "INSERT INTO rewritten_articles (title, link, content, date, category, hash) VALUES (?, ?, ?, ?, ?, ?)",
+            (title, link, content, date, category, h),
         )
         conn.commit()
         return True
@@ -92,13 +101,40 @@ def get_rewritten_article(article_hash: str) -> Optional[Dict[str, str]]:
 def list_rewritten_articles() -> List[Dict[str, str]]:
     conn = get_conn()
     cur = conn.execute(
-        "SELECT title, link, content, date FROM rewritten_articles ORDER BY id DESC"
+        "SELECT id, title, link, content, date, category FROM rewritten_articles ORDER BY id DESC"
     )
     rows = cur.fetchall()
     return [
-        {"title": row[0], "link": row[1], "content": row[2], "date": row[3]}
+        {
+            "id": row[0],
+            "title": row[1],
+            "link": row[2],
+            "content": row[3],
+            "date": row[4],
+            "category": row[5],
+        }
         for row in rows
     ]
+
+
+def delete_article(article_id: int) -> bool:
+    conn = get_conn()
+    cur = conn.execute(
+        "DELETE FROM rewritten_articles WHERE id = ?",
+        (article_id,),
+    )
+    conn.commit()
+    return cur.rowcount > 0
+
+
+def update_article_category(article_id: int, category: str) -> bool:
+    conn = get_conn()
+    cur = conn.execute(
+        "UPDATE rewritten_articles SET category = ? WHERE id = ?",
+        (category, article_id),
+    )
+    conn.commit()
+    return cur.rowcount > 0
 
 
 def record_feed_status(url: str, success: bool, reason: str) -> None:

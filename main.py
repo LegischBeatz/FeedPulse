@@ -16,6 +16,8 @@ from db import (
     store_rewritten_article,
     get_rewritten_article,
     list_rewritten_articles,
+    delete_article,
+    update_article_category,
     compute_hash,
 )
 from fastapi.responses import RedirectResponse
@@ -57,8 +59,15 @@ async def rewrite_article(article: dict, llm: LLMClient, prompt_template: str) -
         "link": article["link"],
         "content": rewritten,
         "date": article.get("date", ""),
+        "category": None,
     }
-    store_rewritten_article(result["title"], result["link"], result["content"], result["date"])
+    store_rewritten_article(
+        result["title"],
+        result["link"],
+        result["content"],
+        result["date"],
+        result["category"],
+    )
     return result
 
 
@@ -109,6 +118,23 @@ async def show_articles(request: Request):
 @app.get("/api/articles")
 async def api_articles():
     return {"articles": list_rewritten_articles()}
+
+
+@app.delete("/api/articles/{article_id}")
+async def api_delete_article(article_id: int):
+    if delete_article(article_id):
+        return {"status": "deleted"}
+    raise HTTPException(status_code=404, detail="Article not found")
+
+
+@app.post("/api/articles/{article_id}/category")
+async def api_set_category(article_id: int, data: dict):
+    category = data.get("category")
+    if category is None:
+        raise HTTPException(status_code=400, detail="Missing category")
+    if update_article_category(article_id, category):
+        return {"status": "updated"}
+    raise HTTPException(status_code=404, detail="Article not found")
 
 
 
