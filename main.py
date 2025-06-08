@@ -2,7 +2,7 @@ import asyncio
 import logging
 from urllib.parse import urlparse
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, HTTPException, Query, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
@@ -16,6 +16,8 @@ from db import (
     store_rewritten_article,
     get_rewritten_article,
     list_rewritten_articles,
+    list_rewritten_articles_with_id,
+    delete_rewritten_articles,
     compute_hash,
 )
 from fastapi.responses import RedirectResponse
@@ -109,6 +111,20 @@ async def show_articles(request: Request):
 @app.get("/api/articles")
 async def api_articles():
     return {"articles": list_rewritten_articles()}
+
+
+@app.get("/edit", response_class=HTMLResponse)
+async def edit_articles(request: Request):
+    articles = list_rewritten_articles_with_id()
+    return templates.TemplateResponse(
+        "edit.html", {"request": request, "articles": articles}
+    )
+
+
+@app.post("/edit")
+async def delete_articles(ids: list[int] = Form(...)):
+    delete_rewritten_articles(ids)
+    return RedirectResponse(url="/edit", status_code=303)
 
 
 

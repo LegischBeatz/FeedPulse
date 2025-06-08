@@ -101,6 +101,36 @@ def list_rewritten_articles() -> List[Dict[str, str]]:
     ]
 
 
+def list_rewritten_articles_with_id() -> List[Dict[str, str]]:
+    conn = get_conn()
+    cur = conn.execute(
+        "SELECT id, title, link, content, date FROM rewritten_articles ORDER BY id DESC"
+    )
+    rows = cur.fetchall()
+    return [
+        {
+            "id": row[0],
+            "title": row[1],
+            "link": row[2],
+            "content": row[3],
+            "date": row[4],
+        }
+        for row in rows
+    ]
+
+
+def delete_rewritten_articles(ids: List[int]) -> None:
+    if not ids:
+        return
+    conn = get_conn()
+    placeholders = ",".join("?" for _ in ids)
+    conn.execute(
+        f"DELETE FROM rewritten_articles WHERE id IN ({placeholders})",
+        ids,
+    )
+    conn.commit()
+
+
 def record_feed_status(url: str, success: bool, reason: str) -> None:
     conn = get_conn()
     conn.execute(
