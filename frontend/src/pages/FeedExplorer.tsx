@@ -21,6 +21,13 @@ export default function FeedExplorer() {
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p className="text-red-600">Failed to load articles. Verify the backend connection.</p>;
+  if (!data || data.length === 0) {
+    return (
+      <p className="text-gray-600">
+        No articles found. Run the feed manager or hit the /summarize endpoint to add some.
+      </p>
+    );
+  }
 
   return (
     <div className="space-y-4">
