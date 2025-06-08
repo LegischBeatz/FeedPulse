@@ -1,0 +1,7 @@
+{
+  "name": "feedpulse-frontend",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "echo building frontend"
+  }
+}
