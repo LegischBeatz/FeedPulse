@@ -122,7 +122,21 @@ sudo systemctl enable feedpulse.service
 sudo systemctl start feedpulse.service
 ```
 
+
 The service launches `main.py` and will automatically restart on failure.
+
+## Front-End Interface
+
+A React + Vite front-end is available in the `frontend/` folder. After installing Node.js, run:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+This starts a development server on port 5173 that communicates with the FastAPI backend. Build a production bundle with `npm run build`.
+
 
 ## Contributing
 
@@ -131,3 +145,4 @@ We welcome contributions from the community! Feel free to submit issues, suggest
 ## License
 
 FeedPulse is open-source and available under the [MIT License](LICENSE).
+

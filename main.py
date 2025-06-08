@@ -96,6 +96,12 @@ async def show_articles(request: Request):
         "articles.html", {"request": request, "articles": articles}
     )
 
+@app.get("/api/articles")
+async def api_articles():
+    return {"articles": list_rewritten_articles()}
+
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000)
+
