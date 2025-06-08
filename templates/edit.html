@@ -4,39 +4,36 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Edit Articles</title>
-    <style>
-        body { font-family: Arial, sans-serif; background:#f0f2f5; margin:0; }
-        header { background:#0d6efd; color:#fff; padding:20px; text-align:center; }
-        main { max-width:800px; margin:20px auto; padding:0 15px; }
-        .card { background:#fff; border-radius:8px; padding:20px; margin-bottom:20px; box-shadow:0 2px 4px rgba(0,0,0,0.1); display:flex; align-items:flex-start; }
-        .info { flex:1; }
-        .card h2 { margin-top:0; }
-        .card h2 a { text-decoration:none; color:#0d6efd; }
-        .card time { color:#555; font-size:0.9em; display:block; margin-bottom:10px; }
-        .card p { margin:0; line-height:1.5; white-space:pre-wrap; }
-        button { padding:10px 20px; background:#0d6efd; color:#fff; border:none; border-radius:4px; cursor:pointer; }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 </head>
-<body>
-    <header>Edit Articles</header>
-    <main>
-        <form method="post" action="/edit">
-            {% if articles %}
-                {% for article in articles %}
-                    <div class="card">
-                        <input type="checkbox" name="ids" value="{{ article.id }}" style="margin-right:10px;" />
-                        <div class="info">
-                            <h2><a href="{{ article.link }}">{{ article.title }}</a></h2>
-                            <time>{{ article.date }}</time>
-                            <p>{{ article.content }}</p>
-                        </div>
+<body class="bg-gray-100">
+    <header class="bg-blue-600 text-white py-4 text-center text-2xl font-semibold">Edit Articles</header>
+    <main class="max-w-3xl mx-auto p-4">
+        {% if articles %}
+            {% for article in articles %}
+                <div class="flex bg-white rounded-lg shadow p-4 mb-4 items-start" id="article-{{ article.id }}">
+                    <div class="flex-1">
+                        <h2 class="text-lg font-semibold"><a href="{{ article.link }}" class="text-blue-600 hover:underline">{{ article.title }}</a></h2>
+                        <time class="text-sm text-gray-500">{{ article.date }}</time>
+                        <p class="mt-2 whitespace-pre-line md-content">{{ article.content }}</p>
                     </div>
-                {% endfor %}
-                <button type="submit">Delete Selected</button>
-            {% else %}
-                <p>No articles found.</p>
-            {% endif %}
-        </form>
+                    <button hx-post="/delete/{{ article.id }}" hx-target="#article-{{ article.id }}" hx-swap="outerHTML" class="ml-4 bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-gray-600">No articles found.</p>
+        {% endif %}
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        function renderMarkdown() {
+            document.querySelectorAll('.md-content').forEach(el => {
+                el.innerHTML = marked.parse(el.textContent);
+            });
+        }
+        document.addEventListener('DOMContentLoaded', renderMarkdown);
+        document.addEventListener('htmx:afterSwap', renderMarkdown);
+    </script>
 </body>
 </html>

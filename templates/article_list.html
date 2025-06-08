@@ -1,0 +1,13 @@
+{% if articles %}
+    {% for article in articles %}
+        <article class="bg-white rounded-lg shadow p-6 mb-4" id="article-{{ article.id|default(0) }}">
+            <h2 class="text-xl font-semibold mb-2">
+                <a href="{{ article.link }}" class="text-blue-600 hover:underline">{{ article.title }}</a>
+            </h2>
+            <time class="text-sm text-gray-500">{{ article.date }}</time>
+            <div class="md-content mt-2">{{ article.content }}</div>
+        </article>
+    {% endfor %}
+{% else %}
+    <p class="text-gray-600">No articles found.</p>
+{% endif %}
