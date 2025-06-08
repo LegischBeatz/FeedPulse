@@ -31,6 +31,19 @@ cd FeedPulse
 pip install -r requirements.txt
 ```
 
+### Docker Compose
+
+The repository now follows a simple monorepo layout with separate `api`,
+`worker`, and `frontend` services. You can spin up the entire stack using Docker
+Compose:
+
+```bash
+docker compose up --build
+```
+
+This starts PostgreSQL, Redis, the FastAPI API, a Celery worker and a minimal
+frontend container.
+
 ### Configuration
 
 The application relies on a running language model service. Edit `config.ini` to
