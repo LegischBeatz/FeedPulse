@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit Articles</title>
+    <style>
+        body { font-family: Arial, sans-serif; background:#f5f8fa; margin:0; display:flex; justify-content:center; }
+        .container { width: 600px; max-width: 100%; margin-top: 20px; }
+        .tweet { background:#fff; border:1px solid #e1e8ed; border-radius:16px; padding:16px; margin-bottom:12px; display:flex; align-items:flex-start; }
+        .tweet-info { flex:1; }
+        .tweet h2 { font-size:20px; margin:0 0 4px 0; }
+        .tweet h2 a { text-decoration:none; color:#1da1f2; }
+        .tweet .date { color:#657786; font-size:14px; margin-bottom:8px; }
+        .tweet p { margin:0; line-height:1.5; white-space:pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form method="post" action="/edit">
+            {% if articles %}
+                {% for article in articles %}
+                    <div class="tweet">
+                        <input type="checkbox" name="ids" value="{{ article.id }}" style="margin-right:10px;" />
+                        <div class="tweet-info">
+                            <h2><a href="{{ article.link }}">{{ article.title }}</a></h2>
+                            <div class="date">{{ article.date }}</div>
+                            <p>{{ article.content }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+                <button type="submit">Delete Selected</button>
+            {% else %}
+                <p>No articles found.</p>
+            {% endif %}
+        </form>
+    </div>
+</body>
+</html>
