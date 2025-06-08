@@ -67,13 +67,15 @@ async def summarize_rss(
     rss_url: str = Query(..., alias="rss_url"),
     model: Optional[str] = None,
     prompt: Optional[str] = None,
+    limit: int = DEFAULT_LIMIT,
 ):
     validate_url(rss_url)
 
-    articles = feed_cache.get(rss_url)
+    cache_key = f"{rss_url}:{limit}"
+    articles = feed_cache.get(cache_key)
     if articles is None:
-        articles = await asyncio.to_thread(parse_rss, rss_url, DEFAULT_LIMIT)
-        feed_cache.set(rss_url, articles)
+        articles = await asyncio.to_thread(parse_rss, rss_url, limit)
+        feed_cache.set(cache_key, articles)
 
     config = LLMConfig.load()
     if model:

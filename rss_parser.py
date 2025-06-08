@@ -3,7 +3,8 @@ import requests
 from typing import List, Dict, Tuple, Optional
 
 
-DEFAULT_LIMIT = 1
+# Number of articles returned when no explicit limit is provided
+DEFAULT_LIMIT = 5
 
 def _get_date(entry) -> str:
     for key in ("published", "updated", "created", "pubDate"):
