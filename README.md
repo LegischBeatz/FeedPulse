@@ -74,7 +74,7 @@ content. Each request also stores the results in a local SQLite database.
 
 ### View Stored Articles
 
-Open `http://localhost:8000/articles` in your browser to view your rewritten articles styled in a tweet-like layout.
+Open `http://localhost:8000/articles` in your browser to view your rewritten articles styled in a tweet-like layout. The page now converts any Markdown in the article summaries to HTML on the client using [marked.js](https://github.com/markedjs/marked) for improved readability.
 
 ## Feed Manager
 

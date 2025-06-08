@@ -12,7 +12,7 @@
         article h2 { margin-top:0; }
         article h2 a { text-decoration:none; color:#0d6efd; }
         article time { color:#555; font-size:0.9em; display:block; margin-bottom:10px; }
-        article .content { white-space:pre-wrap; line-height:1.5; }
+        article .content { line-height:1.5; }
     </style>
 </head>
 <body>
@@ -30,5 +30,14 @@
             <p>No articles found.</p>
         {% endif %}
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.content').forEach(function(el) {
+                const md = el.textContent;
+                el.innerHTML = marked.parse(md);
+            });
+        });
+    </script>
 </body>
 </html>
