@@ -128,19 +128,6 @@ sudo systemctl start feedpulse.service
 
 The service launches `main.py` and will automatically restart on failure.
 
-## Front-End Interface
-
-A React + Vite front-end is available in the `frontend/` folder. Start the FastAPI backend first and then run the front-end:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-This starts a development server on port 5173. Requests to `/api` are automatically proxied to the backend running on port 8000, so make sure the API server is running. Build a production bundle with `npm run build`.
-
-Open `http://localhost:5173/explore` in your browser to browse the rewritten articles stored in the database.
 
 
 ## Contributing
