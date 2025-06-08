@@ -34,6 +34,16 @@ def get_conn():
             )
             """
         )
+        _conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS feed_status (
+                url TEXT PRIMARY KEY,
+                checked_at TEXT,
+                success INTEGER,
+                reason TEXT
+            )
+            """
+        )
         _conn.commit()
     return _conn
 
@@ -89,3 +99,25 @@ def list_rewritten_articles() -> List[Dict[str, str]]:
         {"title": row[0], "link": row[1], "content": row[2], "date": row[3]}
         for row in rows
     ]
+
+
+def record_feed_status(url: str, success: bool, reason: str) -> None:
+    conn = get_conn()
+    conn.execute(
+        """
+        INSERT INTO feed_status (url, checked_at, success, reason)
+        VALUES (?, datetime('now'), ?, ?)
+        ON CONFLICT(url) DO UPDATE SET
+            checked_at = excluded.checked_at,
+            success = excluded.success,
+            reason = excluded.reason
+        """,
+        (url, int(success), reason),
+    )
+    conn.commit()
+
+
+def get_failed_feeds() -> List[str]:
+    conn = get_conn()
+    cur = conn.execute("SELECT url FROM feed_status WHERE success = 0")
+    return [row[0] for row in cur.fetchall()]

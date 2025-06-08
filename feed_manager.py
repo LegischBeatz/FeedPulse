@@ -5,12 +5,12 @@ from configparser import ConfigParser
 from pathlib import Path
 from typing import List, Tuple
 
-from rss_parser import parse_rss, DEFAULT_LIMIT
+from rss_parser import parse_rss, DEFAULT_LIMIT, validate_feed
 from db import (
     store_processed_article,
     store_rewritten_article,
-    compute_hash,
-    get_rewritten_article,
+    record_feed_status,
+    get_failed_feeds,
 )
 from llm_client import LLMClient, LLMConfig
 
@@ -54,8 +54,13 @@ async def rewrite_and_store(
 
 
 async def fetch_and_store(url: str) -> None:
+    ok, reason, data = await asyncio.to_thread(validate_feed, url)
+    record_feed_status(url, ok, reason)
+    if not ok:
+        logging.error("Skipping %s: %s", url, reason)
+        return
     try:
-        articles = await asyncio.to_thread(parse_rss, url, DEFAULT_LIMIT)
+        articles = await asyncio.to_thread(parse_rss, url, DEFAULT_LIMIT, data)
         if len(articles) < DEFAULT_LIMIT:
             logging.warning("%s returned %d articles", url, len(articles))
         else:
@@ -80,7 +85,10 @@ async def run_async(config_path: Path = CONFIG_PATH, loop: bool = False) -> None
         feeds, interval = load_feed_config(config_path)
         if not feeds:
             logging.warning("No feeds configured")
-        tasks = [fetch_and_store(url) for url in feeds]
+        failed = set(get_failed_feeds())
+        if failed:
+            logging.info("Skipping %d failed feeds", len(failed))
+        tasks = [fetch_and_store(url) for url in feeds if url not in failed]
         if tasks:
             await asyncio.gather(*tasks)
         if not loop:
