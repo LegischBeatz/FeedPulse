@@ -52,10 +52,13 @@ The server will listen on `http://localhost:8000` by default.
 
 ### Rewrite a Feed
 
-Send a GET request to `/summarize` with the RSS feed URL:
+Send a GET request to `/summarize` with the RSS feed URL. By default the
+endpoint rewrites the latest five entries, but you can control this with the
+`limit` query parameter:
 
 ```bash
 curl "http://localhost:8000/summarize?rss_url=https://example.com/feed.xml"
+curl "http://localhost:8000/summarize?rss_url=https://example.com/feed.xml&limit=3"
 ```
 
 Optionally, specify a different model using the `model` query parameter or
