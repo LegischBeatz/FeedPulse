@@ -82,7 +82,7 @@ class LLMClient:
     def _clean_output(self, text: str) -> str:
         return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
 
-    def generate(self, prompt: str, temperature: float = 0.1, strip_tags: bool = True) -> str:
+    def generate(self, prompt: str, temperature: float = 0.6, strip_tags: bool = True) -> str:
         payload = {
             "model": self.config.model_name,
             "prompt": prompt,
