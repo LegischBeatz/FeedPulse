@@ -35,8 +35,9 @@ pip install -r requirements.txt
 
 The application relies on a running language model service. Edit `config.ini` to
 point `api_url` to your model's endpoint and specify the `model_name`. You can
-also modify `rewrite_prompt` to change how articles are rewritten. The defaults
-work with an Ollama-compatible API.
+also modify `rewrite_prompt` to change how articles are rewritten. By default
+FeedPulse summarizes each article into a short Markdown bullet list. The
+provided configuration works with an Ollama-compatible API.
 
 ### Running the API
 

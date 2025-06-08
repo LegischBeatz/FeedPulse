@@ -5,26 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Edit Articles</title>
     <style>
-        body { font-family: Arial, sans-serif; background:#f5f8fa; margin:0; display:flex; justify-content:center; }
-        .container { width: 600px; max-width: 100%; margin-top: 20px; }
-        .tweet { background:#fff; border:1px solid #e1e8ed; border-radius:16px; padding:16px; margin-bottom:12px; display:flex; align-items:flex-start; }
-        .tweet-info { flex:1; }
-        .tweet h2 { font-size:20px; margin:0 0 4px 0; }
-        .tweet h2 a { text-decoration:none; color:#1da1f2; }
-        .tweet .date { color:#657786; font-size:14px; margin-bottom:8px; }
-        .tweet p { margin:0; line-height:1.5; white-space:pre-wrap; }
+        body { font-family: Arial, sans-serif; background:#f0f2f5; margin:0; }
+        header { background:#0d6efd; color:#fff; padding:20px; text-align:center; }
+        main { max-width:800px; margin:20px auto; padding:0 15px; }
+        .card { background:#fff; border-radius:8px; padding:20px; margin-bottom:20px; box-shadow:0 2px 4px rgba(0,0,0,0.1); display:flex; align-items:flex-start; }
+        .info { flex:1; }
+        .card h2 { margin-top:0; }
+        .card h2 a { text-decoration:none; color:#0d6efd; }
+        .card time { color:#555; font-size:0.9em; display:block; margin-bottom:10px; }
+        .card p { margin:0; line-height:1.5; white-space:pre-wrap; }
+        button { padding:10px 20px; background:#0d6efd; color:#fff; border:none; border-radius:4px; cursor:pointer; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <header>Edit Articles</header>
+    <main>
         <form method="post" action="/edit">
             {% if articles %}
                 {% for article in articles %}
-                    <div class="tweet">
+                    <div class="card">
                         <input type="checkbox" name="ids" value="{{ article.id }}" style="margin-right:10px;" />
-                        <div class="tweet-info">
+                        <div class="info">
                             <h2><a href="{{ article.link }}">{{ article.title }}</a></h2>
-                            <div class="date">{{ article.date }}</div>
+                            <time>{{ article.date }}</time>
                             <p>{{ article.content }}</p>
                         </div>
                     </div>
@@ -34,6 +37,6 @@
                 <p>No articles found.</p>
             {% endif %}
         </form>
-    </div>
+    </main>
 </body>
 </html>
