@@ -3,7 +3,7 @@ import requests
 from typing import List, Dict, Tuple, Optional
 
 
-DEFAULT_LIMIT = 10
+DEFAULT_LIMIT = 1
 
 def _get_date(entry) -> str:
     for key in ("published", "updated", "created", "pubDate"):
