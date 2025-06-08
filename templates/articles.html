@@ -4,40 +4,22 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>FeedPulse News</title>
-    <style>
-        body { font-family: Arial, sans-serif; background:#f0f2f5; margin:0; }
-        header { background:#0d6efd; color:#fff; padding:20px; text-align:center; }
-        main { max-width:800px; margin:20px auto; padding:0 15px; }
-        article { background:#fff; border-radius:8px; padding:20px; margin-bottom:20px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
-        article h2 { margin-top:0; }
-        article h2 a { text-decoration:none; color:#0d6efd; }
-        article time { color:#555; font-size:0.9em; display:block; margin-bottom:10px; }
-        article .content { line-height:1.5; }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 </head>
-<body>
-    <header>FeedPulse News</header>
-    <main>
-        {% if articles %}
-            {% for article in articles %}
-                <article>
-                    <h2><a href="{{ article.link }}">{{ article.title }}</a></h2>
-                    <time>{{ article.date }}</time>
-                    <div class="content">{{ article.content }}</div>
-                </article>
-            {% endfor %}
-        {% else %}
-            <p>No articles found.</p>
-        {% endif %}
+<body class="bg-gray-100">
+    <header class="bg-blue-600 text-white py-4 text-center text-2xl font-semibold">FeedPulse News</header>
+    <main class="max-w-3xl mx-auto p-4">
+        <div id="articles" hx-get="/article_list" hx-trigger="load" hx-swap="innerHTML"></div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelectorAll('.content').forEach(function(el) {
-                const md = el.textContent;
-                el.innerHTML = marked.parse(md);
+        function renderMarkdown() {
+            document.querySelectorAll('.md-content').forEach(el => {
+                el.innerHTML = marked.parse(el.textContent);
             });
-        });
+        }
+        document.addEventListener('htmx:afterSwap', renderMarkdown);
     </script>
 </body>
 </html>

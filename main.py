@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 
 from fastapi import FastAPI, HTTPException, Query, Request, Form
 from fastapi.responses import HTMLResponse
+from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from typing import Optional
@@ -103,9 +104,16 @@ async def index():
 
 @app.get("/articles", response_class=HTMLResponse)
 async def show_articles(request: Request):
+    return templates.TemplateResponse(
+        "articles.html", {"request": request}
+    )
+
+
+@app.get("/article_list", response_class=HTMLResponse)
+async def article_list(request: Request):
     articles = list_rewritten_articles()
     return templates.TemplateResponse(
-        "articles.html", {"request": request, "articles": articles}
+        "article_list.html", {"request": request, "articles": articles}
     )
 
 @app.get("/api/articles")
@@ -125,6 +133,12 @@ async def edit_articles(request: Request):
 async def delete_articles(ids: list[int] = Form(...)):
     delete_rewritten_articles(ids)
     return RedirectResponse(url="/edit", status_code=303)
+
+
+@app.post("/delete/{article_id}")
+async def delete_article(article_id: int):
+    delete_rewritten_articles([article_id])
+    return Response(status_code=204)
 
 
 
