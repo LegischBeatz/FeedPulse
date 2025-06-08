@@ -90,9 +90,9 @@ the dependencies listed in `requirements.txt` before running it. The default
 python feed_manager.py
 ```
 
-The script runs continuously, polling the configured feeds and persisting new
-articles to `articles.db`. Each cycle retrieves the ten most recent articles from
-every feed and skips entries that already exist in the database.
+By default the script fetches the configured feeds once and stores any new
+articles in `articles.db`. Use the `--loop` flag to poll continuously at the
+interval specified in `config.ini`.
 
 ### Daily Fetch with systemd
 
