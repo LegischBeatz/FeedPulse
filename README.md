@@ -70,8 +70,7 @@ content. Each request also stores the results in a local SQLite database.
 
 ### View Stored Articles
 
-Open `http://localhost:8000/articles` in your browser to see previously
-rewritten articles rendered as a simple web page.
+Open `http://localhost:8000/articles` in your browser to view your rewritten articles styled in a tweet-like layout.
 
 ## Feed Manager
 
