@@ -1,21 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>FeedPulse Articles</title>
+    <style>
+        body { font-family: Arial, sans-serif; background:#f5f8fa; margin:0; display:flex; justify-content:center; }
+        .container { width: 600px; max-width: 100%; margin-top: 20px; }
+        .tweet { background:#fff; border:1px solid #e1e8ed; border-radius:16px; padding:16px; margin-bottom:12px; }
+        .tweet h2 { font-size:20px; margin:0 0 4px 0; }
+        .tweet h2 a { text-decoration:none; color:#1da1f2; }
+        .tweet .date { color:#657786; font-size:14px; margin-bottom:8px; }
+        .tweet p { margin:0; line-height:1.5; white-space:pre-wrap; }
+    </style>
 </head>
 <body>
-    <h1>Rewritten Articles</h1>
-    <ul>
-    {% for article in articles %}
-        <li>
-            <a href="{{ article.link }}">{{ article.title }}</a><br/>
-            <small>{{ article.date }}</small>
-            <p>{{ article.content }}</p>
-        </li>
-    {% else %}
-        <li>No articles found.</li>
-    {% endfor %}
-    </ul>
+    <div class="container">
+        {% if articles %}
+            {% for article in articles %}
+                <div class="tweet">
+                    <h2><a href="{{ article.link }}">{{ article.title }}</a></h2>
+                    <div class="date">{{ article.date }}</div>
+                    <p>{{ article.content }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No articles found.</p>
+        {% endif %}
+    </div>
 </body>
 </html>
