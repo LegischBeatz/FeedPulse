@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import logging
 from configparser import ConfigParser
@@ -72,7 +73,7 @@ async def fetch_and_store(url: str) -> None:
         logging.error("Failed to process %s: %s", url, exc)
 
 
-async def run_async(config_path: Path = CONFIG_PATH) -> None:
+async def run_async(config_path: Path = CONFIG_PATH, loop: bool = False) -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
     logging.info("Feed manager started")
     while True:
@@ -82,13 +83,25 @@ async def run_async(config_path: Path = CONFIG_PATH) -> None:
         tasks = [fetch_and_store(url) for url in feeds]
         if tasks:
             await asyncio.gather(*tasks)
+        if not loop:
+            break
         logging.info("Waiting %s seconds before next fetch", interval)
         await asyncio.sleep(interval)
 
 
-def run(config_path: Path = CONFIG_PATH) -> None:
-    asyncio.run(run_async(config_path))
+def run(config_path: Path = CONFIG_PATH, loop: bool = False) -> None:
+    asyncio.run(run_async(config_path, loop))
 
 
 if __name__ == "__main__":
-    run()
+    parser = argparse.ArgumentParser(description="Fetch and rewrite RSS feeds")
+    parser.add_argument(
+        "--config", type=Path, default=CONFIG_PATH, help="Path to configuration file"
+    )
+    parser.add_argument(
+        "--loop",
+        action="store_true",
+        help="Run continuously using the interval from the config file",
+    )
+    args = parser.parse_args()
+    run(args.config, loop=args.loop)
