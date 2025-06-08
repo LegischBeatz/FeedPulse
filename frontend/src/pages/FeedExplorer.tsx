@@ -9,14 +9,18 @@ interface Article {
 
 async function fetchArticles(): Promise<Article[]> {
   const res = await fetch('/api/articles');
+  if (!res.ok) {
+    throw new Error('API request failed');
+  }
   const data = await res.json();
   return data.articles;
 }
 
 export default function FeedExplorer() {
-  const { data, isLoading } = useQuery(['articles'], fetchArticles);
+  const { data, isLoading, error } = useQuery(['articles'], fetchArticles);
 
   if (isLoading) return <p>Loading...</p>;
+  if (error) return <p className="text-red-600">Failed to load articles. Verify the backend connection.</p>;
 
   return (
     <div className="space-y-4">
