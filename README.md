@@ -77,7 +77,10 @@ Open `http://localhost:8000/articles` in your browser to view your rewritten art
 FeedPulse includes a helper script, `feed_manager.py`, for automatically
 fetching and storing articles from multiple RSS feeds. Ensure you have installed
 the dependencies listed in `requirements.txt` before running it. The default
-`config.ini` lists several security news feeds which are fetched concurrently.
+`config.ini` now contains a curated collection of security RSS feeds grouped by
+analysts, communities, governments, journalists and vendors. You can freely
+edit or replace this list to suit your needs, and the feeds will be fetched
+concurrently.
 
 1. Edit `config.ini` and list your feeds under the `[RSS]` section. You can
    provide one feed URL per line or separate them with commas. Adjust the
